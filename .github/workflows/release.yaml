@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 env:
-  CI_PYPI_TOKEN: ${{ secrets.CI_PYPI_TOKEN }}
+  NPM_TOKEN: ${{ secrets.CI_NPMJS_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
   GITHUB_USER: ${{ vars.CI_GITHUB_USER }}
   GITHUB_USER_EMAIL: ${{ vars.CI_GITHUB_USER_EMAIL }}
@@ -32,7 +32,7 @@ jobs:
             -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/deployments \
-            -d '{"ref": "${{ github.event.inputs.version }}", "environment": "pypi", "auto_merge": false, "required_contexts": []}' \
+            -d '{"ref": "${{ github.event.inputs.version }}", "environment": "npmjs", "auto_merge": false, "required_contexts": []}' \
             | jq -r '.id')
           echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
 
@@ -56,10 +56,15 @@ jobs:
             exit 1
           fi
 
-      - name: Update version in pyproject.toml
+      - name: Update version in package.json
         run: |
-          sed -i 's/^version = .*/version = "'"$VERSION"'"/' pyproject.toml
-          grep -n "^version = " pyproject.toml
+          npm version "$VERSION" --no-git-tag-version
+          grep -n '"version"' package.json
+
+      - name: Update version in src/index.ts
+        run: |
+          sed -i "s/export const VERSION = .*/export const VERSION = '$VERSION';/" src/index.ts
+          grep -n "VERSION" src/index.ts
 
       - name: Configure git identity
         run: |
@@ -72,7 +77,7 @@ jobs:
         with:
           commit_message: ":robot: Bump version to ${{ env.VERSION }}"
           branch: main
-          file_pattern: "pyproject.toml"
+          file_pattern: "package.json package-lock.json src/index.ts"
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
 
@@ -89,7 +94,7 @@ jobs:
           generate_release_notes: true
 
   deploy:
-    name: Deploy to PyPI
+    name: Deploy to npm
     runs-on: ubuntu-latest
     needs: release
     steps:
@@ -99,26 +104,27 @@ jobs:
           ref: main
           token: ${{ secrets.CI_GITHUB_TOKEN }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.10'
-
-      - name: Install Poetry
-        run: curl -sSL https://install.python-poetry.org | python3 -
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: poetry install
+        run: npm ci
 
       - name: Build the package
-        run: poetry build
+        run: npm run build
 
-      - name: Publish package to PyPI
-        run: poetry publish --username __token__ --password ${{ env.CI_PYPI_TOKEN }}
+      - name: Publish package to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
 
   succeed_deployment:
     name: Succeed Deployment
-    environment: pypi
+    environment: npmjs
     runs-on: ubuntu-latest
     needs:
       - release
@@ -131,11 +137,11 @@ jobs:
             -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/deployments/${{ needs.release.outputs.deployment_id }}/statuses \
-            -d '{"state": "success", "description": "Published to PyPI successfully", "environment_url": "https://pypi.org/project/youtube-id/"}'
+            -d '{"state": "success", "description": "Published to npm successfully", "environment_url": "https://www.npmjs.com/package/youtube-id"}'
 
   failed_deployment:
     name: Failed Deployment
-    environment: pypi
+    environment: npmjs
     runs-on: ubuntu-latest
     needs:
       - release
@@ -144,7 +150,7 @@ jobs:
     steps:
       - name: Log failure
         run: |
-          echo "::error::Deployment to PyPI failed"
+          echo "::error::Deployment to npm failed"
 
       - name: Set deployment status to failure
         run: |
@@ -152,4 +158,4 @@ jobs:
             -H "Authorization: token ${{ env.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/deployments/${{ needs.release.outputs.deployment_id }}/statuses \
-            -d '{"state": "failure", "description": "Failed to publish to PyPI"}'
+            -d '{"state": "failure", "description": "Failed to publish to npm"}'
