@@ -6,29 +6,28 @@ Thank you for your interest in contributing to youtube-id! This guide will help 
 
 ### Prerequisites
 
-- Python 3.10 or higher
-- [Poetry](https://python-poetry.org/) for dependency management
+- Node.js 18 or higher
+- npm (comes with Node.js)
 
 ### Setup
 
 1. Fork and clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/yid-py.git
-   cd yid-py
+   git clone https://github.com/your-username/youtube-id-ts.git
+   cd youtube-id-ts
    ```
 
-2. Create a virtual environment:
+2. Install dependencies:
 
    ```bash
-   python3.10 -m venv venv
-   source venv/bin/activate
+   npm install
    ```
 
-3. Install dependencies:
+3. Build the package:
 
    ```bash
-   poetry install --with dev
+   npm run build
    ```
 
 ## Development Workflow
@@ -47,16 +46,13 @@ Thank you for your interest in contributing to youtube-id! This guide will help 
 
    ```bash
    # Lint
-   ruff check .
-
-   # Format
-   ruff format .
+   npm run lint
 
    # Type check
-   mypy yid_py/
+   npm run typecheck
 
    # Tests with coverage
-   pytest --cov=yid_py --cov-report=term-missing
+   npm run test:coverage
    ```
 
 4. Commit your changes:
@@ -70,11 +66,10 @@ Thank you for your interest in contributing to youtube-id! This guide will help 
 
 All contributions must:
 
-- Pass `ruff check` with no errors
-- Pass `ruff format --check` with no changes needed
-- Pass `mypy` strict type checking
-- Maintain 95%+ test coverage
-- Include type hints for all public functions
+- Pass `npm run lint` with no errors
+- Pass `npm run typecheck` with no errors
+- Maintain 95%+ test coverage for core modules
+- Include type annotations for all public functions
 - Include tests for new functionality
 
 ## Pull Request Process
@@ -106,7 +101,7 @@ All contributions must:
 
 When reporting issues, please include:
 
-- Python version
+- Node.js version
 - Operating system
 - Minimal code example to reproduce
 - Expected vs actual behavior

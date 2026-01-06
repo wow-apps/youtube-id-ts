@@ -6,7 +6,7 @@ applyTo: "**/*.md"
 
 ## Linting
 
-We use **pymarkdownlnt** for markdown linting.
+We use **markdownlint** for markdown linting.
 
 ## Rules
 
@@ -22,9 +22,9 @@ We use **pymarkdownlnt** for markdown linting.
 
 ```bash
 # Lint markdown files
-pymarkdown --config .pymarkdown scan README.md CONTRIBUTING.md CODE_OF_CONDUCT.md
+npx markdownlint-cli2 "**/*.md" "#node_modules" "#CLAUDE.md"
 ```
 
 ## Configuration
 
-See `.pymarkdown` for linting rules.
+See `.markdownlint.json` for linting rules.

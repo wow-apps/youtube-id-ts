@@ -16,10 +16,10 @@ Example: "I need to encode multiple numbers at once, but currently have to call 
 
 Describe the solution you'd like to see implemented.
 
-```python
-import yid_py
+```typescript
+import { toAlphanumeric } from 'youtube-id';
 
-# Example of how you'd like to use the new feature
+// Example of how you'd like to use the new feature
 ```
 
 ## Alternatives Considered

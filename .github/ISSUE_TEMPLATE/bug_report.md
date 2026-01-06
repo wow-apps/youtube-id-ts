@@ -12,13 +12,13 @@ A clear and concise description of the bug.
 
 ## Steps to Reproduce
 
-1. Install youtube-id: `pip install youtube-id`
+1. Install youtube-id: `npm install youtube-id`
 2. Run the following code:
 
-```python
-import yid_py
+```typescript
+import { toAlphanumeric, toNumeric } from 'youtube-id';
 
-# Your code here
+// Your code here
 ```
 
 3. See error
@@ -34,22 +34,22 @@ What actually happened.
 ## Error Message
 
 ```
-Paste the full error message/traceback here
+Paste the full error message/stack trace here
 ```
 
 ## Environment
 
-- **Python version**: (e.g., 3.10.15)
+- **Node.js version**: (e.g., 22.0.0)
 - **youtube-id version**: (e.g., 1.0.0)
 - **OS**: (e.g., macOS 14.0, Ubuntu 22.04, Windows 11)
-- **Installation method**: (pip, poetry, etc.)
+- **Package manager**: (npm, yarn, pnpm, etc.)
 
 ## Minimal Reproducible Example
 
-```python
-import yid_py
+```typescript
+import { toAlphanumeric, toNumeric } from 'youtube-id';
 
-# Minimal code that reproduces the issue
+// Minimal code that reproduces the issue
 ```
 
 ## Additional Context
@@ -60,4 +60,4 @@ Add any other context about the problem here (screenshots, related issues, etc.)
 
 - [ ] I have searched existing issues to ensure this bug hasn't been reported
 - [ ] I have included a minimal reproducible example
-- [ ] I have included the full error message/traceback
+- [ ] I have included the full error message/stack trace

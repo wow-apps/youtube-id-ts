@@ -3,98 +3,95 @@
 This document describes the coding standards and best practices for the project.
 All code must pass automated quality checks before merging to main.
 
-## Python
+## TypeScript
 
-We use **ruff** for linting and formatting, **mypy** for type checking.
+We use **ESLint** for linting and **TypeScript** for type checking.
 
 ### Rules
 
-- Python 3.10+ required
-- Line length: 88 characters (Black-compatible)
-- Use type hints for all public functions
-- Use modern Python syntax (match/case, `str | None`, etc.)
+- Node.js 18+ required
+- Use TypeScript strict mode
+- Use type annotations for all public functions
+- Use modern TypeScript/ES2022+ syntax
 
-### Lint Rules (ruff)
+### Lint Rules (ESLint)
 
-| Code | Description               |
-|------|---------------------------|
-| E    | pycodestyle errors        |
-| F    | pyflakes                  |
-| I    | isort (import sorting)    |
-| UP   | pyupgrade (modern syntax) |
-| B    | bugbear (common bugs)     |
-| SIM  | simplify code             |
+| Plugin              | Description                    |
+|---------------------|--------------------------------|
+| @eslint/js          | Core JavaScript rules          |
+| typescript-eslint   | TypeScript-specific rules      |
+| strict              | Strict type-checked rules      |
+| stylistic           | Code style consistency         |
 
-### Type Checking (mypy)
+### Type Checking (TypeScript)
 
 - Strict mode enabled
 - All functions must have type annotations
-- No `Any` types without explicit ignore
+- No implicit `any` types
+- Exact optional property types enabled
 
 ### Commands
 
 ```bash
 # Lint check
-ruff check .
-
-# Format check
-ruff format --check .
+npm run lint
 
 # Auto-fix
-ruff check --fix .
-ruff format .
+npm run lint:fix
 
 # Type check
-mypy yid_py/
+npm run typecheck
 ```
 
 ### Configuration
 
-See `pyproject.toml` for `[tool.ruff]` and `[tool.mypy]` sections.
+See `eslint.config.js` for ESLint rules and `tsconfig.json` for TypeScript settings.
 
 ### Useful Links
 
-- [Ruff Documentation](https://docs.astral.sh/ruff/)
-- [Mypy Documentation](https://mypy.readthedocs.io/)
-- [PEP 8 Style Guide](https://peps.python.org/pep-0008/)
-- [PEP 484 Type Hints](https://peps.python.org/pep-0484/)
+- [ESLint Documentation](https://eslint.org/docs/latest/)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [typescript-eslint](https://typescript-eslint.io/)
 
 ## Testing
 
-We use **pytest** with **pytest-cov** for testing and coverage.
+We use **Vitest** for testing and coverage.
 
 ### Rules
 
-- Minimum 95% code coverage required
+- Minimum 95% code coverage required for core modules
 - All public functions must have tests
 - Use descriptive test names
-- Group tests in classes by functionality
+- Group tests in `describe` blocks by functionality
 
 ### Commands
 
 ```bash
 # Run tests
-pytest
+npm test
+
+# Run tests in watch mode
+npm run test:watch
 
 # Run with coverage
-pytest --cov=yid_py --cov-report=term-missing
+npm run test:coverage
 
-# Run specific test
-pytest tests/test_converter.py::TestToAlphanumeric
+# Run specific test file
+npx vitest run tests/converter.test.ts
 ```
 
 ### Configuration
 
-See `pyproject.toml` for `[tool.pytest.ini_options]` section.
+See `vitest.config.ts` for test configuration.
 
 ### Useful Links
 
-- [Pytest Documentation](https://docs.pytest.org/)
-- [pytest-cov Documentation](https://pytest-cov.readthedocs.io/)
+- [Vitest Documentation](https://vitest.dev/)
+- [Vitest Coverage](https://vitest.dev/guide/coverage.html)
 
 ## Markdown
 
-We use **pymarkdownlnt** for linting.
+We use **markdownlint** for linting.
 
 ### Rules
 
@@ -106,16 +103,16 @@ We use **pymarkdownlnt** for linting.
 
 ```bash
 # Lint markdown files
-pymarkdown --config .pymarkdown scan README.md CONTRIBUTING.md CODE_OF_CONDUCT.md
+npx markdownlint-cli2 "**/*.md" "#node_modules" "#CLAUDE.md"
 ```
 
 ### Configuration
 
-See `.pymarkdown` for linting rules.
+See `.markdownlint.json` for linting rules.
 
 ### Useful Links
 
-- [pymarkdownlnt Documentation](https://github.com/jackdewinter/pymarkdown)
+- [markdownlint Documentation](https://github.com/DavidAnson/markdownlint)
 - [Markdown Guide](https://www.markdownguide.org/)
 
 ## Git Workflow
@@ -138,9 +135,8 @@ See `.pymarkdown` for linting rules.
 
 Before committing, ensure:
 
-- [ ] `ruff check .` passes
-- [ ] `ruff format --check .` passes
-- [ ] `mypy yid_py/` passes
-- [ ] `pytest --cov=yid_py` passes with 95%+ coverage
-- [ ] All new code has type hints
+- [ ] `npm run lint` passes
+- [ ] `npm run typecheck` passes
+- [ ] `npm test` passes
+- [ ] All new code has type annotations
 - [ ] All new functions have tests
