@@ -7,25 +7,25 @@
  *   Kevin van Zonneveld <kevin@transloadit.com> (https://github.com/kvz)
  */
 
-import { sha256, sha512 } from './hash';
+import {sha256, sha512} from './hash';
 
 /**
  * Raised when conversion fails.
  */
 export class ConverterError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ConverterError';
-  }
+    constructor(message: string) {
+        super(message);
+        this.name = 'ConverterError';
+    }
 }
 
 /**
  * Transformation options for alphanumeric output.
  */
 export enum Transform {
-  NONE = 0,
-  UPPER = 1,
-  LOWER = 2,
+    NONE = 0,
+    UPPER = 1,
+    LOWER = 2,
 }
 
 // Base dictionary: a-z + 0-9 + A-Z (62 characters)
@@ -36,12 +36,12 @@ const DICT_LEN = DICTIONARY.length;
  * Options for conversion functions.
  */
 export interface ConvertOptions {
-  /** Padding value for the conversion. */
-  padUp?: number;
-  /** Optional key to shuffle the dictionary for obfuscation. */
-  secureKey?: string;
-  /** Case transformation (NONE, UPPER, LOWER). */
-  transform?: Transform;
+    /** Padding value for the conversion. */
+    padUp?: number;
+    /** Optional key to shuffle the dictionary for obfuscation. */
+    secureKey?: string;
+    /** Case transformation (NONE, UPPER, LOWER). */
+    transform?: Transform;
 }
 
 /**
@@ -61,13 +61,13 @@ export interface ConvertOptions {
  * ```
  */
 export function toAlphanumeric(
-  number: number,
-  options: ConvertOptions = {}
+    number: number,
+    options: ConvertOptions = {}
 ): string {
-  const { padUp = 0, secureKey, transform = Transform.NONE } = options;
-  const dictionary = secureKey ? secureDictionary(secureKey) : DICTIONARY;
-  const result = numToAlpha(number, dictionary, padUp);
-  return applyTransform(result, transform);
+    const {padUp = 0, secureKey, transform = Transform.NONE} = options;
+    const dictionary = secureKey ? secureDictionary(secureKey) : DICTIONARY;
+    const result = numToAlpha(number, dictionary, padUp);
+    return applyTransform(result, transform);
 }
 
 /**
@@ -84,12 +84,12 @@ export function toAlphanumeric(
  * ```
  */
 export function toNumeric(
-  alphanumeric: string,
-  options: Omit<ConvertOptions, 'transform'> = {}
+    alphanumeric: string,
+    options: Omit<ConvertOptions, 'transform'> = {}
 ): number {
-  const { padUp = 0, secureKey } = options;
-  const dictionary = secureKey ? secureDictionary(secureKey) : DICTIONARY;
-  return alphaToNum(alphanumeric, dictionary, padUp);
+    const {padUp = 0, secureKey} = options;
+    const dictionary = secureKey ? secureDictionary(secureKey) : DICTIONARY;
+    return alphaToNum(alphanumeric, dictionary, padUp);
 }
 
 /**
@@ -105,42 +105,42 @@ export function toNumeric(
  * ```
  */
 export class Encoder {
-  private readonly padUp: number;
-  private readonly transform: Transform;
-  private readonly dictionary: string;
+    private readonly padUp: number;
+    private readonly transform: Transform;
+    private readonly dictionary: string;
 
-  constructor(options: ConvertOptions = {}) {
-    this.padUp = options.padUp ?? 0;
-    this.transform = options.transform ?? Transform.NONE;
-    this.dictionary = options.secureKey
-      ? secureDictionary(options.secureKey)
-      : DICTIONARY;
-  }
+    constructor(options: ConvertOptions = {}) {
+        this.padUp = options.padUp ?? 0;
+        this.transform = options.transform ?? Transform.NONE;
+        this.dictionary = options.secureKey
+            ? secureDictionary(options.secureKey)
+            : DICTIONARY;
+    }
 
-  /**
-   * Convert a number to an alphanumeric string.
-   * Returns the transformed result (if transform was set).
-   * For the raw (non-transformed) result, use encodeRaw().
-   */
-  encode(number: number): string {
-    const result = numToAlpha(number, this.dictionary, this.padUp);
-    return applyTransform(result, this.transform);
-  }
+    /**
+     * Convert a number to an alphanumeric string.
+     * Returns the transformed result (if transform was set).
+     * For the raw (non-transformed) result, use encodeRaw().
+     */
+    encode(number: number): string {
+        const result = numToAlpha(number, this.dictionary, this.padUp);
+        return applyTransform(result, this.transform);
+    }
 
-  /**
-   * Convert a number to an alphanumeric string without transform.
-   */
-  encodeRaw(number: number): string {
-    return numToAlpha(number, this.dictionary, this.padUp);
-  }
+    /**
+     * Convert a number to an alphanumeric string without transform.
+     */
+    encodeRaw(number: number): string {
+        return numToAlpha(number, this.dictionary, this.padUp);
+    }
 
-  /**
-   * Convert an alphanumeric string back to a number.
-   * Expects the raw (non-transformed) value from encodeRaw().
-   */
-  decode(alphanumeric: string): number {
-    return alphaToNum(alphanumeric, this.dictionary, this.padUp);
-  }
+    /**
+     * Convert an alphanumeric string back to a number.
+     * Expects the raw (non-transformed) value from encodeRaw().
+     */
+    decode(alphanumeric: string): number {
+        return alphaToNum(alphanumeric, this.dictionary, this.padUp);
+    }
 }
 
 /**
@@ -157,7 +157,7 @@ export class Encoder {
  * ```
  */
 export function create(options: ConvertOptions = {}): Encoder {
-  return new Encoder(options);
+    return new Encoder(options);
 }
 
 // --- Private functions ---
@@ -168,84 +168,84 @@ export function create(options: ConvertOptions = {}): Encoder {
  * without knowing the key.
  */
 function secureDictionary(secureKey: string): string {
-  const sha256Hash = sha256(secureKey);
-  const secureHash =
-    sha256Hash.length < DICT_LEN ? sha512(secureKey) : sha256Hash;
+    const sha256Hash = sha256(secureKey);
+    const secureHash =
+        sha256Hash.length < DICT_LEN ? sha512(secureKey) : sha256Hash;
 
-  // Pair hash characters with dictionary characters and sort
-  const pairs: [string, string][] = [];
-  for (let i = 0; i < DICT_LEN; i++) {
-    pairs.push([secureHash[i]!, DICTIONARY[i]!]);
-  }
+    // Pair hash characters with dictionary characters and sort
+    const pairs: [string, string][] = [];
+    for (let i = 0; i < DICT_LEN; i++) {
+        pairs.push([secureHash[i]!, DICTIONARY[i]!]);
+    }
 
-  // Sort by hash character in reverse order
-  pairs.sort((a, b) => (b[0] > a[0] ? 1 : b[0] < a[0] ? -1 : 0));
+    // Sort by hash character in reverse order
+    pairs.sort((a, b) => (b[0] > a[0] ? 1 : b[0] < a[0] ? -1 : 0));
 
-  return pairs.map(([, char]) => char).join('');
+    return pairs.map(([, char]) => char).join('');
 }
 
 /**
  * Convert number to alphanumeric string.
  */
 function numToAlpha(number: number, dictionary: string, padUp: number): string {
-  if (padUp > 1) {
-    number += Math.pow(DICT_LEN, padUp - 1);
-  }
+    if (padUp > 1) {
+        number += Math.pow(DICT_LEN, padUp - 1);
+    }
 
-  if (number === 0) {
-    return dictionary[0]!;
-  }
+    if (number === 0) {
+        return dictionary[0]!;
+    }
 
-  const output: string[] = [];
-  let t = Math.floor(Math.log(number) / Math.log(DICT_LEN));
+    const output: string[] = [];
+    let t = Math.floor(Math.log(number) / Math.log(DICT_LEN));
 
-  while (t >= 0) {
-    const bcp = Math.pow(DICT_LEN, t);
-    const index = Math.floor(number / bcp) % DICT_LEN;
-    output.push(dictionary[index]!);
-    number -= index * bcp;
-    t -= 1;
-  }
+    while (t >= 0) {
+        const bcp = Math.pow(DICT_LEN, t);
+        const index = Math.floor(number / bcp) % DICT_LEN;
+        output.push(dictionary[index]!);
+        number -= index * bcp;
+        t -= 1;
+    }
 
-  return output.join('');
+    return output.join('');
 }
 
 /**
  * Convert alphanumeric string to number.
  */
 function alphaToNum(
-  alphanumeric: string,
-  dictionary: string,
-  padUp: number
+    alphanumeric: string,
+    dictionary: string,
+    padUp: number
 ): number {
-  let result = 0;
+    let result = 0;
 
-  const chars = alphanumeric.split('').reverse();
-  for (let i = 0; i < chars.length; i++) {
-    const char = chars[i]!;
-    const index = dictionary.indexOf(char);
-    result += index * Math.pow(DICT_LEN, i);
-  }
+    const chars = alphanumeric.split('').reverse();
+    for (let i = 0; i < chars.length; i++) {
+        const char = chars[i]!;
+        const index = dictionary.indexOf(char);
+        result += index * Math.pow(DICT_LEN, i);
+    }
 
-  if (padUp > 1) {
-    result -= Math.pow(DICT_LEN, padUp - 1);
-  }
+    if (padUp > 1) {
+        result -= Math.pow(DICT_LEN, padUp - 1);
+    }
 
-  return result;
+    return result;
 }
 
 /**
  * Apply case transformation.
  */
 function applyTransform(value: string, transform: Transform): string {
-  switch (transform) {
-    case Transform.NONE:
-      return value;
-    case Transform.UPPER:
-      return value.toUpperCase();
-    case Transform.LOWER:
-      return value.toLowerCase();
-    default:
-      throw new ConverterError(`Invalid transform type: ${transform}`);
-  }
+    switch (transform) {
+        case Transform.NONE:
+            return value;
+        case Transform.UPPER:
+            return value.toUpperCase();
+        case Transform.LOWER:
+            return value.toLowerCase();
+        default:
+            throw new ConverterError(`Invalid transform type: ${transform}`);
+    }
 }

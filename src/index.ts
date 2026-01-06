@@ -28,14 +28,14 @@
  */
 
 export {
-  toAlphanumeric,
-  toNumeric,
-  create,
-  Encoder,
-  Transform,
-  ConverterError,
+    toAlphanumeric,
+    toNumeric,
+    create,
+    Encoder,
+    Transform,
+    ConverterError,
 } from './converter';
 
-export type { ConvertOptions } from './converter';
+export type {ConvertOptions} from './converter';
 
 export const VERSION = '1.0.0';
