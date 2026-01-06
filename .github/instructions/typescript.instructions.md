@@ -24,6 +24,7 @@ applyTo: "**/*.ts"
 ## Linting Rules (ESLint)
 
 Enabled configurations:
+
 - `@eslint/js` - Core JavaScript rules
 - `typescript-eslint/strict` - Strict TypeScript rules
 - `typescript-eslint/stylistic` - Code style consistency

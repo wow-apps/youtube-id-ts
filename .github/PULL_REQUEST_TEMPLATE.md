@@ -1,3 +1,5 @@
+# Pull Request
+
 ## Summary
 
 <!-- Brief description of changes -->
@@ -16,15 +18,14 @@
 
 ## Testing
 
-- [ ] Tests pass locally (`pytest --cov=yid_py`)
+- [ ] Tests pass locally (`npm test`)
 - [ ] New tests added for new functionality
 - [ ] Coverage maintained at 95%+
 
 ## Quality Checks
 
-- [ ] `ruff check .` passes
-- [ ] `ruff format --check .` passes
-- [ ] `mypy yid_py/` passes
+- [ ] `npm run lint` passes
+- [ ] `npm run typecheck` passes
 
 ## Related Issues
 

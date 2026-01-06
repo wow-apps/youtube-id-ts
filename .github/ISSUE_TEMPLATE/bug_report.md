@@ -13,15 +13,15 @@ A clear and concise description of the bug.
 ## Steps to Reproduce
 
 1. Install youtube-id: `npm install youtube-id`
-2. Run the following code:
+1. Run the following code:
 
-```typescript
-import { toAlphanumeric, toNumeric } from 'youtube-id';
+   ```typescript
+   import { toAlphanumeric, toNumeric } from 'youtube-id';
 
-// Your code here
-```
+   // Your code here
+   ```
 
-3. See error
+1. See error
 
 ## Expected Behavior
 
@@ -33,7 +33,7 @@ What actually happened.
 
 ## Error Message
 
-```
+```text
 Paste the full error message/stack trace here
 ```
 
