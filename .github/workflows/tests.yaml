@@ -1,0 +1,197 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/*'
+  pull_request:
+    branches:
+      - main
+      - 'release/*'
+
+jobs:
+  check_changes:
+    name: Check File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      has_typescript_changes: ${{ steps.changes.outputs.typescript }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            typescript:
+              - '**/*.ts'
+              - '**/*.tsx'
+              - 'package.json'
+              - 'package-lock.json'
+
+  unit_tests:
+    name: Unit Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: check_changes
+    if: needs.check_changes.outputs.has_typescript_changes == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests with Coverage
+        run: |
+          echo "=== Running Unit Tests ==="
+          npm run test:coverage
+
+      - name: Report Coverage
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            coverage=$(node -e "const c = require('./coverage/coverage-summary.json'); console.log(c.total.lines.pct)")
+            threshold=95
+            echo "Coverage: ${coverage}%"
+            if (( $(echo "$coverage >= $threshold" | bc -l) )); then
+              echo "::notice::Test coverage: ${coverage}% (threshold: ${threshold}%)"
+            else
+              echo "::warning::Test coverage: ${coverage}% is below threshold of ${threshold}%"
+            fi
+          fi
+
+  integration_tests:
+    name: Integration Tests (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    needs: check_changes
+    if: needs.check_changes.outputs.has_typescript_changes == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['18', '20', '22', '23']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Run Integration Tests
+        run: |
+          echo "=== Integration Tests for Node.js ${{ matrix.node-version }} ==="
+          node -e "
+          const { toAlphanumeric, toNumeric, create, Transform, VERSION } = require('./dist/index.cjs');
+
+          console.log('Node.js version:', process.version);
+          console.log('youtube-id version:', VERSION);
+          console.log();
+
+          // Test 1: Basic encoding/decoding
+          console.log('Test 1: Basic encoding/decoding');
+          const encoded = toAlphanumeric(12345);
+          const decoded = toNumeric(encoded);
+          if (encoded !== 'dnh') throw new Error('Expected dnh, got ' + encoded);
+          if (decoded !== 12345) throw new Error('Expected 12345, got ' + decoded);
+          console.log('  12345 ->', encoded, '->', decoded, '✓');
+
+          // Test 2: Zero and boundary values
+          console.log('Test 2: Zero and boundary values');
+          if (toAlphanumeric(0) !== 'a') throw new Error('0 should encode to a');
+          if (toAlphanumeric(61) !== 'Z') throw new Error('61 should encode to Z');
+          if (toAlphanumeric(62) !== 'ba') throw new Error('62 should encode to ba');
+          console.log('  0 -> a, 61 -> Z, 62 -> ba ✓');
+
+          // Test 3: Secure key
+          console.log('Test 3: Secure key obfuscation');
+          const secureEncoded = toAlphanumeric(12345, { secureKey: 'secret' });
+          const secureDecoded = toNumeric(secureEncoded, { secureKey: 'secret' });
+          if (secureEncoded === 'dnh') throw new Error('Secure encoding should differ');
+          if (secureDecoded !== 12345) throw new Error('Expected 12345, got ' + secureDecoded);
+          console.log('  12345 (secure) ->', secureEncoded, '->', secureDecoded, '✓');
+
+          // Test 4: Transform
+          console.log('Test 4: Case transformation');
+          const upper = toAlphanumeric(12345, { transform: Transform.UPPER });
+          const lower = toAlphanumeric(12345, { transform: Transform.LOWER });
+          if (upper !== 'DNH') throw new Error('Expected DNH, got ' + upper);
+          if (lower !== 'dnh') throw new Error('Expected dnh, got ' + lower);
+          console.log('  UPPER:', upper, ', LOWER:', lower, '✓');
+
+          // Test 5: Encoder class
+          console.log('Test 5: Encoder class');
+          const enc = create({ secureKey: 'test' });
+          const encResult = enc.encode(12345);
+          const decResult = enc.decode(enc.encodeRaw(12345));
+          if (decResult !== 12345) throw new Error('Expected 12345, got ' + decResult);
+          console.log('  Encoder: encode=' + encResult + ', decode=' + decResult, '✓');
+
+          // Test 6: Large numbers
+          console.log('Test 6: Large numbers');
+          const large = 10 ** 12;
+          const largeEncoded = toAlphanumeric(large);
+          const largeDecoded = toNumeric(largeEncoded);
+          if (largeDecoded !== large) throw new Error('Expected ' + large + ', got ' + largeDecoded);
+          console.log('  ' + large + ' ->', largeEncoded, '->', largeDecoded, '✓');
+
+          // Test 7: Roundtrip consistency
+          console.log('Test 7: Roundtrip consistency');
+          const testNumbers = [0, 1, 100, 1000, 12345, 999999, 10 ** 9];
+          for (const num of testNumbers) {
+            const result = toNumeric(toAlphanumeric(num));
+            if (result !== num) throw new Error('Roundtrip failed for ' + num);
+          }
+          console.log('  All', testNumbers.length, 'roundtrips passed ✓');
+
+          console.log();
+          console.log('=== All integration tests passed! ===');
+          "
+
+  status:
+    name: tests_passed
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - unit_tests
+      - integration_tests
+    steps:
+      - name: Check job results
+        run: |
+          unit_result="${{ needs.unit_tests.result }}"
+          integration_result="${{ needs.integration_tests.result }}"
+
+          echo "Unit Tests: $unit_result"
+          echo "Integration Tests: $integration_result"
+
+          # Fail if any job failed
+          if [[ "$unit_result" == "failure" ]] || [[ "$integration_result" == "failure" ]]; then
+            echo "::error::Tests failed"
+            exit 1
+          fi
+
+          # Success if all jobs passed or were skipped
+          if [[ "$unit_result" == "success" || "$unit_result" == "skipped" ]] && \
+             [[ "$integration_result" == "success" || "$integration_result" == "skipped" ]]; then
+            echo "::notice::All tests passed"
+            exit 0
+          fi
+
+          # Catch any unexpected state
+          echo "::error::Unexpected job state"
+          exit 1
