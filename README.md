@@ -2,7 +2,7 @@
 
 Generate YouTube-style short IDs from numbers. Lightweight, fast, and reversible base62 encoder with optional obfuscation.
 
-[![npm version](https://badge.fury.io/js/youtube-id.svg)](https://badge.fury.io/js/youtube-id)
+[![npm version](https://badge.fury.io/js/youtube-like-id.svg)](https://badge.fury.io/js/youtube-like-id)
 [![Node.js 18+](https://img.shields.io/badge/node-18+-blue.svg)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
@@ -26,20 +26,20 @@ Generate YouTube-style short IDs from numbers. Lightweight, fast, and reversible
 ## Installation
 
 ```bash
-npm install youtube-id
+npm install youtube-like-id
 ```
 
 Or with yarn/pnpm:
 
 ```bash
-yarn add youtube-id
-pnpm add youtube-id
+yarn add youtube-like-id
+pnpm add youtube-like-id
 ```
 
 ## Quick Start
 
 ```typescript
-import { toAlphanumeric, toNumeric } from 'youtube-id';
+import { toAlphanumeric, toNumeric } from 'youtube-like-id';
 
 // Encode a number to a short string
 toAlphanumeric(12345);  // -> 'dnh'
@@ -53,7 +53,7 @@ toNumeric('dnh');  // -> 12345
 ### Basic Encoding/Decoding
 
 ```typescript
-import { toAlphanumeric, toNumeric } from 'youtube-id';
+import { toAlphanumeric, toNumeric } from 'youtube-like-id';
 
 // Number to alphanumeric
 toAlphanumeric(0);        // -> 'a'
@@ -71,7 +71,7 @@ toNumeric('dnh');         // -> 12345
 Use a secure key to shuffle the dictionary, making IDs harder to predict:
 
 ```typescript
-import { toAlphanumeric, toNumeric } from 'youtube-id';
+import { toAlphanumeric, toNumeric } from 'youtube-like-id';
 
 // Without key
 toAlphanumeric(12345);                          // -> 'dnh'
@@ -86,7 +86,7 @@ toNumeric('UDJ', { secureKey: 'secret' });      // -> 12345
 ### Case Transformation
 
 ```typescript
-import { toAlphanumeric, Transform } from 'youtube-id';
+import { toAlphanumeric, Transform } from 'youtube-like-id';
 
 toAlphanumeric(12345, { transform: Transform.UPPER });  // -> 'DNH'
 toAlphanumeric(12345, { transform: Transform.LOWER });  // -> 'dnh'
@@ -97,7 +97,7 @@ toAlphanumeric(12345, { transform: Transform.LOWER });  // -> 'dnh'
 For repeated operations with the same settings, use the `Encoder` class:
 
 ```typescript
-import { create, Transform } from 'youtube-id';
+import { create, Transform } from 'youtube-like-id';
 
 // Create encoder with preset options
 const enc = create({ secureKey: 'my-secret', transform: Transform.UPPER });

@@ -1,5 +1,5 @@
 /**
- * Tests for youtube-id converter module.
+ * Tests for youtube-like-id converter module.
  */
 
 import { describe, it, expect } from 'vitest';

@@ -6,7 +6,7 @@ applyTo: "**/*"
 
 ## Project Overview
 
-youtube-id is a TypeScript library for generating YouTube-style short IDs from numbers.
+youtube-like-id is a TypeScript library for generating YouTube-style short IDs from numbers.
 Lightweight, fast, and reversible base62 encoder with optional obfuscation.
 
 ## Tech Stack
