@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a new feature or enhancement for youtube-id
+about: Suggest a new feature or enhancement for youtube-like-id
 title: "[FEATURE] "
 labels: enhancement
 assignees: ""
@@ -17,7 +17,7 @@ Example: "I need to encode multiple numbers at once, but currently have to call 
 Describe the solution you'd like to see implemented.
 
 ```typescript
-import { toAlphanumeric } from 'youtube-id';
+import { toAlphanumeric } from 'youtube-like-id';
 
 // Example of how you'd like to use the new feature
 ```

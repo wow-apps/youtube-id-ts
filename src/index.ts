@@ -1,5 +1,5 @@
 /**
- * youtube-id: Generate YouTube-style short IDs from numbers.
+ * youtube-like-id: Generate YouTube-style short IDs from numbers.
  * Lightweight, fast, and reversible base62 encoder with optional obfuscation.
  *
  * Authors:
@@ -8,7 +8,7 @@
  *
  * @example
  * ```ts
- * import { toAlphanumeric, toNumeric, Transform } from 'youtube-id';
+ * import { toAlphanumeric, toNumeric, Transform } from 'youtube-like-id';
  *
  * toAlphanumeric(12345);
  * // => 'dnh'
