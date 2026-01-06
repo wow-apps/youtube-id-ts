@@ -19,7 +19,7 @@ jobs:
       has_markdown_changes: ${{ steps.changes.outputs.markdown }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check for changes
         uses: dorny/paths-filter@v3
@@ -45,12 +45,12 @@ jobs:
     if: needs.check_changes.outputs.has_typescript_changes == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'npm'
@@ -64,7 +64,7 @@ jobs:
           npm run lint:fix || true
 
       - name: Commit fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: ":robot: style: autofix typescript formatting"
 
@@ -85,10 +85,10 @@ jobs:
     if: needs.check_changes.outputs.has_markdown_changes == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
 
