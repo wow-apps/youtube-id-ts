@@ -1,5 +1,5 @@
 {
-  "name": "youtube-id",
+  "name": "youtube-like-id",
   "version": "0.0.9",
   "description": "Generate YouTube-style short IDs from numbers. Lightweight, fast, and reversible base62 encoder with optional obfuscation.",
   "author": "Oleksii Samara <oleksii@wildsoft.io> (https://github.com/wow-apps)",

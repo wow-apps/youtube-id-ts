@@ -100,7 +100,7 @@ jobs:
           const { toAlphanumeric, toNumeric, create, Transform, VERSION } = require('./dist/index.cjs');
 
           console.log('Node.js version:', process.version);
-          console.log('youtube-id version:', VERSION);
+          console.log('youtube-like-id version:', VERSION);
           console.log();
 
           // Test 1: Basic encoding/decoding

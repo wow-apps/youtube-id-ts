@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug to help us improve youtube-id
+about: Report a bug to help us improve youtube-like-id
 title: "[BUG] "
 labels: bug
 assignees: ""
@@ -12,11 +12,11 @@ A clear and concise description of the bug.
 
 ## Steps to Reproduce
 
-1. Install youtube-id: `npm install youtube-id`
+1. Install youtube-like-id: `npm install youtube-like-id`
 1. Run the following code:
 
    ```typescript
-   import { toAlphanumeric, toNumeric } from 'youtube-id';
+   import { toAlphanumeric, toNumeric } from 'youtube-like-id';
 
    // Your code here
    ```
@@ -40,14 +40,14 @@ Paste the full error message/stack trace here
 ## Environment
 
 - **Node.js version**: (e.g., 22.0.0)
-- **youtube-id version**: (e.g., 1.0.0)
+- **youtube-like-id version**: (e.g., 1.0.0)
 - **OS**: (e.g., macOS 14.0, Ubuntu 22.04, Windows 11)
 - **Package manager**: (npm, yarn, pnpm, etc.)
 
 ## Minimal Reproducible Example
 
 ```typescript
-import { toAlphanumeric, toNumeric } from 'youtube-id';
+import { toAlphanumeric, toNumeric } from 'youtube-like-id';
 
 // Minimal code that reproduces the issue
 ```
