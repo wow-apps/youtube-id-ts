@@ -42,6 +42,8 @@ jobs:
               echo "label=documentation" >> $GITHUB_OUTPUT
             elif [[ "$BRANCH_NAME" == refactor/* ]]; then
               echo "label=refactoring" >> $GITHUB_OUTPUT
+            elif [[ "$BRANCH_NAME" == dependabot/* ]]; then
+              echo "label=refactoring" >> $GITHUB_OUTPUT
             elif [[ "$BRANCH_NAME" == test/* ]]; then
               echo "label=refactoring" >> $GITHUB_OUTPUT
             fi
