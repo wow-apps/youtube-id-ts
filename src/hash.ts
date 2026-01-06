@@ -6,34 +6,37 @@
 // Try to import Node.js crypto (will be undefined in browser)
 let nodeCrypto: typeof import('crypto') | undefined;
 try {
-  // Dynamic import check for Node.js environment
-  if (typeof process !== 'undefined' && process.versions?.node) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    nodeCrypto = require('crypto');
-  }
+    // Dynamic import check for Node.js environment
+    if (typeof process !== 'undefined' && process.versions?.node) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        nodeCrypto = require('crypto');
+    }
 } catch {
-  // Not in Node.js environment
+    // Not in Node.js environment
 }
 
 /**
  * Compute SHA256 hash of a string, returned as hex.
  */
 export function sha256(input: string): string {
-  if (nodeCrypto) {
-    return nodeCrypto.createHash('sha256').update(input, 'utf8').digest('hex');
-  }
-  return sha256Pure(input);
+    if (nodeCrypto) {
+        return nodeCrypto.createHash('sha256').update(input, 'utf8').digest('hex');
+    }
+    return sha256Pure(input);
 }
 
 /**
  * Compute SHA512 hash of a string, returned as hex.
  */
 export function sha512(input: string): string {
-  if (nodeCrypto) {
-    return nodeCrypto.createHash('sha512').update(input, 'utf8').digest('hex');
-  }
-  return sha512Pure(input);
+    if (nodeCrypto) {
+        return nodeCrypto.createHash('sha512').update(input, 'utf8').digest('hex');
+    }
+    return sha512Pure(input);
 }
+
+// Export pure implementations for testing
+export {sha256Pure, sha512Pure};
 
 // ============================================================================
 // Pure JavaScript SHA-256 implementation
@@ -41,107 +44,107 @@ export function sha512(input: string): string {
 // ============================================================================
 
 const K256 = [
-  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1,
-  0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
-  0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
-  0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147,
-  0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
-  0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
-  0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a,
-  0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
-  0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1,
+    0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+    0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
+    0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147,
+    0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+    0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
+    0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a,
+    0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 ];
 
 function rotr32(x: number, n: number): number {
-  return ((x >>> n) | (x << (32 - n))) >>> 0;
+    return ((x >>> n) | (x << (32 - n))) >>> 0;
 }
 
 function sha256Pure(input: string): string {
-  // Convert string to UTF-8 bytes
-  const encoder = new TextEncoder();
-  const data = encoder.encode(input);
+    // Convert string to UTF-8 bytes
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
 
-  // Pre-processing: add padding
-  const bitLen = data.length * 8;
-  const padLen = (data.length + 9) % 64 === 0 ? 64 : 64 - ((data.length + 9) % 64);
-  const padded = new Uint8Array(data.length + 1 + padLen + 8);
-  padded.set(data);
-  padded[data.length] = 0x80;
+    // Pre-processing: add padding
+    const bitLen = data.length * 8;
+    const padLen = (64 - ((data.length + 9) % 64)) % 64;
+    const padded = new Uint8Array(data.length + 1 + padLen + 8);
+    padded.set(data);
+    padded[data.length] = 0x80;
 
-  // Append length as 64-bit big-endian
-  const view = new DataView(padded.buffer);
-  view.setUint32(padded.length - 4, bitLen >>> 0, false);
+    // Append length as 64-bit big-endian
+    const view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 4, bitLen >>> 0, false);
 
-  // Initial hash values
-  let h0 = 0x6a09e667;
-  let h1 = 0xbb67ae85;
-  let h2 = 0x3c6ef372;
-  let h3 = 0xa54ff53a;
-  let h4 = 0x510e527f;
-  let h5 = 0x9b05688c;
-  let h6 = 0x1f83d9ab;
-  let h7 = 0x5be0cd19;
+    // Initial hash values
+    let h0 = 0x6a09e667;
+    let h1 = 0xbb67ae85;
+    let h2 = 0x3c6ef372;
+    let h3 = 0xa54ff53a;
+    let h4 = 0x510e527f;
+    let h5 = 0x9b05688c;
+    let h6 = 0x1f83d9ab;
+    let h7 = 0x5be0cd19;
 
-  // Process each 512-bit chunk
-  const w = new Uint32Array(64);
-  for (let i = 0; i < padded.length; i += 64) {
-    // Copy chunk into first 16 words
-    for (let j = 0; j < 16; j++) {
-      w[j] = view.getUint32(i + j * 4, false);
+    // Process each 512-bit chunk
+    const w = new Uint32Array(64);
+    for (let i = 0; i < padded.length; i += 64) {
+        // Copy chunk into first 16 words
+        for (let j = 0; j < 16; j++) {
+            w[j] = view.getUint32(i + j * 4, false);
+        }
+
+        // Extend to 64 words
+        for (let j = 16; j < 64; j++) {
+            const s0 = rotr32(w[j - 15]!, 7) ^ rotr32(w[j - 15]!, 18) ^ (w[j - 15]! >>> 3);
+            const s1 = rotr32(w[j - 2]!, 17) ^ rotr32(w[j - 2]!, 19) ^ (w[j - 2]! >>> 10);
+            w[j] = (w[j - 16]! + s0 + w[j - 7]! + s1) >>> 0;
+        }
+
+        // Initialize working variables
+        let a = h0;
+        let b = h1;
+        let c = h2;
+        let d = h3;
+        let e = h4;
+        let f = h5;
+        let g = h6;
+        let h = h7;
+
+        // Compression function
+        for (let j = 0; j < 64; j++) {
+            const S1 = rotr32(e, 6) ^ rotr32(e, 11) ^ rotr32(e, 25);
+            const ch = (e & f) ^ (~e & g);
+            const temp1 = (h + S1 + ch + K256[j]! + w[j]!) >>> 0;
+            const S0 = rotr32(a, 2) ^ rotr32(a, 13) ^ rotr32(a, 22);
+            const maj = (a & b) ^ (a & c) ^ (b & c);
+            const temp2 = (S0 + maj) >>> 0;
+
+            h = g;
+            g = f;
+            f = e;
+            e = (d + temp1) >>> 0;
+            d = c;
+            c = b;
+            b = a;
+            a = (temp1 + temp2) >>> 0;
+        }
+
+        // Update hash values
+        h0 = (h0 + a) >>> 0;
+        h1 = (h1 + b) >>> 0;
+        h2 = (h2 + c) >>> 0;
+        h3 = (h3 + d) >>> 0;
+        h4 = (h4 + e) >>> 0;
+        h5 = (h5 + f) >>> 0;
+        h6 = (h6 + g) >>> 0;
+        h7 = (h7 + h) >>> 0;
     }
 
-    // Extend to 64 words
-    for (let j = 16; j < 64; j++) {
-      const s0 = rotr32(w[j - 15]!, 7) ^ rotr32(w[j - 15]!, 18) ^ (w[j - 15]! >>> 3);
-      const s1 = rotr32(w[j - 2]!, 17) ^ rotr32(w[j - 2]!, 19) ^ (w[j - 2]! >>> 10);
-      w[j] = (w[j - 16]! + s0 + w[j - 7]! + s1) >>> 0;
-    }
-
-    // Initialize working variables
-    let a = h0;
-    let b = h1;
-    let c = h2;
-    let d = h3;
-    let e = h4;
-    let f = h5;
-    let g = h6;
-    let h = h7;
-
-    // Compression function
-    for (let j = 0; j < 64; j++) {
-      const S1 = rotr32(e, 6) ^ rotr32(e, 11) ^ rotr32(e, 25);
-      const ch = (e & f) ^ (~e & g);
-      const temp1 = (h + S1 + ch + K256[j]! + w[j]!) >>> 0;
-      const S0 = rotr32(a, 2) ^ rotr32(a, 13) ^ rotr32(a, 22);
-      const maj = (a & b) ^ (a & c) ^ (b & c);
-      const temp2 = (S0 + maj) >>> 0;
-
-      h = g;
-      g = f;
-      f = e;
-      e = (d + temp1) >>> 0;
-      d = c;
-      c = b;
-      b = a;
-      a = (temp1 + temp2) >>> 0;
-    }
-
-    // Update hash values
-    h0 = (h0 + a) >>> 0;
-    h1 = (h1 + b) >>> 0;
-    h2 = (h2 + c) >>> 0;
-    h3 = (h3 + d) >>> 0;
-    h4 = (h4 + e) >>> 0;
-    h5 = (h5 + f) >>> 0;
-    h6 = (h6 + g) >>> 0;
-    h7 = (h7 + h) >>> 0;
-  }
-
-  // Produce final hash
-  const toHex = (n: number) => n.toString(16).padStart(8, '0');
-  return toHex(h0) + toHex(h1) + toHex(h2) + toHex(h3) + toHex(h4) + toHex(h5) + toHex(h6) + toHex(h7);
+    // Produce final hash
+    const toHex = (n: number) => n.toString(16).padStart(8, '0');
+    return toHex(h0) + toHex(h1) + toHex(h2) + toHex(h3) + toHex(h4) + toHex(h5) + toHex(h6) + toHex(h7);
 }
 
 // ============================================================================
@@ -152,140 +155,140 @@ function sha256Pure(input: string): string {
 type U64 = [number, number]; // [high, low]
 
 const K512: U64[] = [
-  [0x428a2f98, 0xd728ae22], [0x71374491, 0x23ef65cd], [0xb5c0fbcf, 0xec4d3b2f], [0xe9b5dba5, 0x8189dbbc],
-  [0x3956c25b, 0xf348b538], [0x59f111f1, 0xb605d019], [0x923f82a4, 0xaf194f9b], [0xab1c5ed5, 0xda6d8118],
-  [0xd807aa98, 0xa3030242], [0x12835b01, 0x45706fbe], [0x243185be, 0x4ee4b28c], [0x550c7dc3, 0xd5ffb4e2],
-  [0x72be5d74, 0xf27b896f], [0x80deb1fe, 0x3b1696b1], [0x9bdc06a7, 0x25c71235], [0xc19bf174, 0xcf692694],
-  [0xe49b69c1, 0x9ef14ad2], [0xefbe4786, 0x384f25e3], [0x0fc19dc6, 0x8b8cd5b5], [0x240ca1cc, 0x77ac9c65],
-  [0x2de92c6f, 0x592b0275], [0x4a7484aa, 0x6ea6e483], [0x5cb0a9dc, 0xbd41fbd4], [0x76f988da, 0x831153b5],
-  [0x983e5152, 0xee66dfab], [0xa831c66d, 0x2db43210], [0xb00327c8, 0x98fb213f], [0xbf597fc7, 0xbeef0ee4],
-  [0xc6e00bf3, 0x3da88fc2], [0xd5a79147, 0x930aa725], [0x06ca6351, 0xe003826f], [0x14292967, 0x0a0e6e70],
-  [0x27b70a85, 0x46d22ffc], [0x2e1b2138, 0x5c26c926], [0x4d2c6dfc, 0x5ac42aed], [0x53380d13, 0x9d95b3df],
-  [0x650a7354, 0x8baf63de], [0x766a0abb, 0x3c77b2a8], [0x81c2c92e, 0x47edaee6], [0x92722c85, 0x1482353b],
-  [0xa2bfe8a1, 0x4cf10364], [0xa81a664b, 0xbc423001], [0xc24b8b70, 0xd0f89791], [0xc76c51a3, 0x0654be30],
-  [0xd192e819, 0xd6ef5218], [0xd6990624, 0x5565a910], [0xf40e3585, 0x5771202a], [0x106aa070, 0x32bbd1b8],
-  [0x19a4c116, 0xb8d2d0c8], [0x1e376c08, 0x5141ab53], [0x2748774c, 0xdf8eeb99], [0x34b0bcb5, 0xe19b48a8],
-  [0x391c0cb3, 0xc5c95a63], [0x4ed8aa4a, 0xe3418acb], [0x5b9cca4f, 0x7763e373], [0x682e6ff3, 0xd6b2b8a3],
-  [0x748f82ee, 0x5defb2fc], [0x78a5636f, 0x43172f60], [0x84c87814, 0xa1f0ab72], [0x8cc70208, 0x1a6439ec],
-  [0x90befffa, 0x23631e28], [0xa4506ceb, 0xde82bde9], [0xbef9a3f7, 0xb2c67915], [0xc67178f2, 0xe372532b],
-  [0xca273ece, 0xea26619c], [0xd186b8c7, 0x21c0c207], [0xeada7dd6, 0xcde0eb1e], [0xf57d4f7f, 0xee6ed178],
-  [0x06f067aa, 0x72176fba], [0x0a637dc5, 0xa2c898a6], [0x113f9804, 0xbef90dae], [0x1b710b35, 0x131c471b],
-  [0x28db77f5, 0x23047d84], [0x32caab7b, 0x40c72493], [0x3c9ebe0a, 0x15c9bebc], [0x431d67c4, 0x9c100d4c],
-  [0x4cc5d4be, 0xcb3e42b6], [0x597f299c, 0xfc657e2a], [0x5fcb6fab, 0x3ad6faec], [0x6c44198c, 0x4a475817],
+    [0x428a2f98, 0xd728ae22], [0x71374491, 0x23ef65cd], [0xb5c0fbcf, 0xec4d3b2f], [0xe9b5dba5, 0x8189dbbc],
+    [0x3956c25b, 0xf348b538], [0x59f111f1, 0xb605d019], [0x923f82a4, 0xaf194f9b], [0xab1c5ed5, 0xda6d8118],
+    [0xd807aa98, 0xa3030242], [0x12835b01, 0x45706fbe], [0x243185be, 0x4ee4b28c], [0x550c7dc3, 0xd5ffb4e2],
+    [0x72be5d74, 0xf27b896f], [0x80deb1fe, 0x3b1696b1], [0x9bdc06a7, 0x25c71235], [0xc19bf174, 0xcf692694],
+    [0xe49b69c1, 0x9ef14ad2], [0xefbe4786, 0x384f25e3], [0x0fc19dc6, 0x8b8cd5b5], [0x240ca1cc, 0x77ac9c65],
+    [0x2de92c6f, 0x592b0275], [0x4a7484aa, 0x6ea6e483], [0x5cb0a9dc, 0xbd41fbd4], [0x76f988da, 0x831153b5],
+    [0x983e5152, 0xee66dfab], [0xa831c66d, 0x2db43210], [0xb00327c8, 0x98fb213f], [0xbf597fc7, 0xbeef0ee4],
+    [0xc6e00bf3, 0x3da88fc2], [0xd5a79147, 0x930aa725], [0x06ca6351, 0xe003826f], [0x14292967, 0x0a0e6e70],
+    [0x27b70a85, 0x46d22ffc], [0x2e1b2138, 0x5c26c926], [0x4d2c6dfc, 0x5ac42aed], [0x53380d13, 0x9d95b3df],
+    [0x650a7354, 0x8baf63de], [0x766a0abb, 0x3c77b2a8], [0x81c2c92e, 0x47edaee6], [0x92722c85, 0x1482353b],
+    [0xa2bfe8a1, 0x4cf10364], [0xa81a664b, 0xbc423001], [0xc24b8b70, 0xd0f89791], [0xc76c51a3, 0x0654be30],
+    [0xd192e819, 0xd6ef5218], [0xd6990624, 0x5565a910], [0xf40e3585, 0x5771202a], [0x106aa070, 0x32bbd1b8],
+    [0x19a4c116, 0xb8d2d0c8], [0x1e376c08, 0x5141ab53], [0x2748774c, 0xdf8eeb99], [0x34b0bcb5, 0xe19b48a8],
+    [0x391c0cb3, 0xc5c95a63], [0x4ed8aa4a, 0xe3418acb], [0x5b9cca4f, 0x7763e373], [0x682e6ff3, 0xd6b2b8a3],
+    [0x748f82ee, 0x5defb2fc], [0x78a5636f, 0x43172f60], [0x84c87814, 0xa1f0ab72], [0x8cc70208, 0x1a6439ec],
+    [0x90befffa, 0x23631e28], [0xa4506ceb, 0xde82bde9], [0xbef9a3f7, 0xb2c67915], [0xc67178f2, 0xe372532b],
+    [0xca273ece, 0xea26619c], [0xd186b8c7, 0x21c0c207], [0xeada7dd6, 0xcde0eb1e], [0xf57d4f7f, 0xee6ed178],
+    [0x06f067aa, 0x72176fba], [0x0a637dc5, 0xa2c898a6], [0x113f9804, 0xbef90dae], [0x1b710b35, 0x131c471b],
+    [0x28db77f5, 0x23047d84], [0x32caab7b, 0x40c72493], [0x3c9ebe0a, 0x15c9bebc], [0x431d67c4, 0x9c100d4c],
+    [0x4cc5d4be, 0xcb3e42b6], [0x597f299c, 0xfc657e2a], [0x5fcb6fab, 0x3ad6faec], [0x6c44198c, 0x4a475817],
 ];
 
 function add64(a: U64, b: U64): U64 {
-  const lo = (a[1] + b[1]) >>> 0;
-  const hi = (a[0] + b[0] + (lo < a[1] ? 1 : 0)) >>> 0;
-  return [hi, lo];
+    const lo = (a[1] + b[1]) >>> 0;
+    const hi = (a[0] + b[0] + (lo < a[1] ? 1 : 0)) >>> 0;
+    return [hi, lo];
 }
 
 function rotr64(x: U64, n: number): U64 {
-  if (n < 32) {
+    if (n < 32) {
+        return [
+            ((x[0] >>> n) | (x[1] << (32 - n))) >>> 0,
+            ((x[1] >>> n) | (x[0] << (32 - n))) >>> 0,
+        ];
+    }
+    n -= 32;
     return [
-      ((x[0] >>> n) | (x[1] << (32 - n))) >>> 0,
-      ((x[1] >>> n) | (x[0] << (32 - n))) >>> 0,
+        ((x[1] >>> n) | (x[0] << (32 - n))) >>> 0,
+        ((x[0] >>> n) | (x[1] << (32 - n))) >>> 0,
     ];
-  }
-  n -= 32;
-  return [
-    ((x[1] >>> n) | (x[0] << (32 - n))) >>> 0,
-    ((x[0] >>> n) | (x[1] << (32 - n))) >>> 0,
-  ];
 }
 
 function shr64(x: U64, n: number): U64 {
-  if (n < 32) {
-    return [
-      x[0] >>> n,
-      ((x[1] >>> n) | (x[0] << (32 - n))) >>> 0,
-    ];
-  }
-  return [0, x[0] >>> (n - 32)];
+    if (n < 32) {
+        return [
+            x[0] >>> n,
+            ((x[1] >>> n) | (x[0] << (32 - n))) >>> 0,
+        ];
+    }
+    return [0, x[0] >>> (n - 32)];
 }
 
 function xor64(a: U64, b: U64): U64 {
-  return [(a[0] ^ b[0]) >>> 0, (a[1] ^ b[1]) >>> 0];
+    return [(a[0] ^ b[0]) >>> 0, (a[1] ^ b[1]) >>> 0];
 }
 
 function and64(a: U64, b: U64): U64 {
-  return [(a[0] & b[0]) >>> 0, (a[1] & b[1]) >>> 0];
+    return [(a[0] & b[0]) >>> 0, (a[1] & b[1]) >>> 0];
 }
 
 function not64(x: U64): U64 {
-  return [(~x[0]) >>> 0, (~x[1]) >>> 0];
+    return [(~x[0]) >>> 0, (~x[1]) >>> 0];
 }
 
 function sha512Pure(input: string): string {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(input);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(input);
 
-  // Pre-processing: add padding (SHA-512 uses 128-byte blocks)
-  const bitLen = data.length * 8;
-  const padLen = (data.length + 17) % 128 === 0 ? 128 : 128 - ((data.length + 17) % 128);
-  const padded = new Uint8Array(data.length + 1 + padLen + 16);
-  padded.set(data);
-  padded[data.length] = 0x80;
+    // Pre-processing: add padding (SHA-512 uses 128-byte blocks)
+    const bitLen = data.length * 8;
+    const padLen = (128 - ((data.length + 17) % 128)) % 128;
+    const padded = new Uint8Array(data.length + 1 + padLen + 16);
+    padded.set(data);
+    padded[data.length] = 0x80;
 
-  // Append length as 128-bit big-endian (we only use lower 64 bits)
-  const view = new DataView(padded.buffer);
-  view.setUint32(padded.length - 4, bitLen >>> 0, false);
+    // Append length as 128-bit big-endian (we only use lower 64 bits)
+    const view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 4, bitLen >>> 0, false);
 
-  // Initial hash values
-  const H: U64[] = [
-    [0x6a09e667, 0xf3bcc908], [0xbb67ae85, 0x84caa73b],
-    [0x3c6ef372, 0xfe94f82b], [0xa54ff53a, 0x5f1d36f1],
-    [0x510e527f, 0xade682d1], [0x9b05688c, 0x2b3e6c1f],
-    [0x1f83d9ab, 0xfb41bd6b], [0x5be0cd19, 0x137e2179],
-  ];
+    // Initial hash values
+    const H: U64[] = [
+        [0x6a09e667, 0xf3bcc908], [0xbb67ae85, 0x84caa73b],
+        [0x3c6ef372, 0xfe94f82b], [0xa54ff53a, 0x5f1d36f1],
+        [0x510e527f, 0xade682d1], [0x9b05688c, 0x2b3e6c1f],
+        [0x1f83d9ab, 0xfb41bd6b], [0x5be0cd19, 0x137e2179],
+    ];
 
-  const w: U64[] = new Array(80);
-  for (let i = 0; i < padded.length; i += 128) {
-    // Copy chunk into first 16 words
-    for (let j = 0; j < 16; j++) {
-      w[j] = [
-        view.getUint32(i + j * 8, false),
-        view.getUint32(i + j * 8 + 4, false),
-      ];
+    const w: U64[] = new Array(80);
+    for (let i = 0; i < padded.length; i += 128) {
+        // Copy chunk into first 16 words
+        for (let j = 0; j < 16; j++) {
+            w[j] = [
+                view.getUint32(i + j * 8, false),
+                view.getUint32(i + j * 8 + 4, false),
+            ];
+        }
+
+        // Extend to 80 words
+        for (let j = 16; j < 80; j++) {
+            const s0 = xor64(xor64(rotr64(w[j - 15]!, 1), rotr64(w[j - 15]!, 8)), shr64(w[j - 15]!, 7));
+            const s1 = xor64(xor64(rotr64(w[j - 2]!, 19), rotr64(w[j - 2]!, 61)), shr64(w[j - 2]!, 6));
+            w[j] = add64(add64(add64(w[j - 16]!, s0), w[j - 7]!), s1);
+        }
+
+        let [a, b, c, d, e, f, g, h] = H;
+
+        for (let j = 0; j < 80; j++) {
+            const S1 = xor64(xor64(rotr64(e!, 14), rotr64(e!, 18)), rotr64(e!, 41));
+            const ch = xor64(and64(e!, f!), and64(not64(e!), g!));
+            const temp1 = add64(add64(add64(add64(h!, S1), ch), K512[j]!), w[j]!);
+            const S0 = xor64(xor64(rotr64(a!, 28), rotr64(a!, 34)), rotr64(a!, 39));
+            const maj = xor64(xor64(and64(a!, b!), and64(a!, c!)), and64(b!, c!));
+            const temp2 = add64(S0, maj);
+
+            h = g;
+            g = f;
+            f = e;
+            e = add64(d!, temp1);
+            d = c;
+            c = b;
+            b = a;
+            a = add64(temp1, temp2);
+        }
+
+        H[0] = add64(H[0]!, a!);
+        H[1] = add64(H[1]!, b!);
+        H[2] = add64(H[2]!, c!);
+        H[3] = add64(H[3]!, d!);
+        H[4] = add64(H[4]!, e!);
+        H[5] = add64(H[5]!, f!);
+        H[6] = add64(H[6]!, g!);
+        H[7] = add64(H[7]!, h!);
     }
 
-    // Extend to 80 words
-    for (let j = 16; j < 80; j++) {
-      const s0 = xor64(xor64(rotr64(w[j - 15]!, 1), rotr64(w[j - 15]!, 8)), shr64(w[j - 15]!, 7));
-      const s1 = xor64(xor64(rotr64(w[j - 2]!, 19), rotr64(w[j - 2]!, 61)), shr64(w[j - 2]!, 6));
-      w[j] = add64(add64(add64(w[j - 16]!, s0), w[j - 7]!), s1);
-    }
-
-    let [a, b, c, d, e, f, g, h] = H;
-
-    for (let j = 0; j < 80; j++) {
-      const S1 = xor64(xor64(rotr64(e!, 14), rotr64(e!, 18)), rotr64(e!, 41));
-      const ch = xor64(and64(e!, f!), and64(not64(e!), g!));
-      const temp1 = add64(add64(add64(add64(h!, S1), ch), K512[j]!), w[j]!);
-      const S0 = xor64(xor64(rotr64(a!, 28), rotr64(a!, 34)), rotr64(a!, 39));
-      const maj = xor64(xor64(and64(a!, b!), and64(a!, c!)), and64(b!, c!));
-      const temp2 = add64(S0, maj);
-
-      h = g;
-      g = f;
-      f = e;
-      e = add64(d!, temp1);
-      d = c;
-      c = b;
-      b = a;
-      a = add64(temp1, temp2);
-    }
-
-    H[0] = add64(H[0]!, a!);
-    H[1] = add64(H[1]!, b!);
-    H[2] = add64(H[2]!, c!);
-    H[3] = add64(H[3]!, d!);
-    H[4] = add64(H[4]!, e!);
-    H[5] = add64(H[5]!, f!);
-    H[6] = add64(H[6]!, g!);
-    H[7] = add64(H[7]!, h!);
-  }
-
-  const toHex64 = (u: U64) => u[0].toString(16).padStart(8, '0') + u[1].toString(16).padStart(8, '0');
-  return H.map(toHex64).join('');
+    const toHex64 = (u: U64) => u[0].toString(16).padStart(8, '0') + u[1].toString(16).padStart(8, '0');
+    return H.map(toHex64).join('');
 }
