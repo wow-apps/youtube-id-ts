@@ -73,7 +73,7 @@ jobs:
 
       - name: Commit release version
         id: auto-commit
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: ":robot: Bump version to ${{ env.VERSION }}"
           branch: main
@@ -105,7 +105,7 @@ jobs:
           token: ${{ secrets.CI_GITHUB_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
