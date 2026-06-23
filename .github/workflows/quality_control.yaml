@@ -19,7 +19,7 @@ jobs:
       has_markdown_changes: ${{ steps.changes.outputs.markdown }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Check for changes
         uses: dorny/paths-filter@v4
@@ -45,7 +45,7 @@ jobs:
     if: needs.check_changes.outputs.has_typescript_changes == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref || github.ref_name }}
 
@@ -85,7 +85,7 @@ jobs:
     if: needs.check_changes.outputs.has_markdown_changes == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
